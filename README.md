@@ -1,4 +1,4 @@
-# CrewAI Stock
+﻿# CrewAI Stock
 
 > 基于 CrewAI 多智能体协作的 A 股智能分析与推荐系统（学习研究用）
 
@@ -59,7 +59,7 @@
 | LLM | DeepSeek（推理）/ Grok（实时搜索） |
 | Embeddings | 硅基流动 BAAI/bge-m3 |
 | Web | Flask 3 + Vue3 + Element Plus + ECharts |
-| 数据 | SQLite + SQLAlchemy ORM（14 张表）|
+| 数据 | SQLite + SQLAlchemy ORM（15 张表）|
 | 数据源 | 智兔 API（主力）+ 东方财富爬虫（实时行情）+ Tavily（备用新闻） |
 
 ## 快速开始

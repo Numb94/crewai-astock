@@ -1,4 +1,4 @@
-# CrewAI Stock — AI 协作指南
+﻿# CrewAI Stock — AI 协作指南
 
 > 这份文档面向在本仓库工作的 AI 助手（如 Claude Code），用于快速建立项目心智模型。
 
@@ -15,7 +15,7 @@
 | config | `src/config/` | LLM / Embeddings 配置 |
 | core | `src/core/` | 用户容器管理、新闻监控调度 |
 | crews | `src/crews/` | 3 个 Crew 配置（推荐 / 评估 / 监控） |
-| database | `src/database/` | ORM 模型（14 张表）+ DB 管理 |
+| database | `src/database/` | ORM 模型（15 张表）+ DB 管理 |
 | tools | `src/tools/` | 数据源适配（智兔 / 东财 / Grok / Tavily） |
 | utils | `src/utils/` | 通用工具（推送、缓存、交易日历） |
 
@@ -35,7 +35,7 @@
 持仓监控师（独立 Crew，5 分钟轮询）
 ```
 
-## 数据库表（14 张 ORM + 1 张非 ORM + 1 张新闻）
+## 数据库表（15 张 ORM + 1 张非 ORM）
 
 `candidates` / `positions` / `transactions` / `reviews` / `agent_memory` / `market_sentiment` /
 `system_config` / `strategy_executions` / `strategy_performance` / `strategy_weights` /
