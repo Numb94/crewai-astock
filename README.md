@@ -170,7 +170,7 @@ crewai-astock/
 
 ## 社区讨论
 
-🔗 Linux.do 开源推广帖：https://linux.do/t/topic/2205861
+🔗 Linux.do 开源推广帖：https://linux.do/t/topic/2206032
 
 欢迎来贴讨论 / 反馈 / 吐槽。
 
