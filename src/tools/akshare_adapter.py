@@ -226,9 +226,9 @@ class AKShareAdapter:
             now = datetime.now()
             start = now.replace(year=now.year - 1).strftime("%Y%m%d")
 
-        # 重试 3 次（东方财富偶发切连接）
+        # 重试 4 次，退避 1/2/4 秒（东方财富偶发切连接）
         last_err = None
-        for attempt in range(3):
+        for attempt in range(4):
             try:
                 df = _akshare().stock_zh_a_hist(
                     symbol=code, period=period,
@@ -249,9 +249,9 @@ class AKShareAdapter:
                 ]
             except Exception as e:
                 last_err = e
-                if attempt < 2:
-                    time.sleep(0.5 * (attempt + 1))
-        logger.error(f"AKShare get_history_timeframe({code}) 重试 3 次失败: {last_err}")
+                if attempt < 3:
+                    time.sleep(2 ** attempt)
+        logger.error(f"AKShare get_history_timeframe({code}) 重试 4 次失败: {last_err}")
         return []
 
     def get_latest_timeframe(self, stock_symbol: str, timeframe: str = "d",
@@ -440,19 +440,122 @@ class AKShareAdapter:
             logger.warning(f"AKShare get_index_realtime({index_code}) 失败: {e}")
             return {}
 
-    # ====== 未实现的接口（保持调用方不崩） ======
+    # ====== BOLL 指标（本地计算） ======
 
-    def get_tick_by_tick(self, stock_code: str) -> List[Dict[str, Any]]:
-        logger.debug("get_tick_by_tick 在开源版未实现（请使用 src/tools/tick_data_fetcher.py 的东方财富接口）")
+    def get_history_boll(self, stock_symbol: str, timeframe: str = "d",
+                         adjust_type: str = "n", start_time: str = None,
+                         end_time: str = None, latest_count: int = None) -> List[Dict[str, Any]]:
+        """BOLL（20 日，2 倍标准差）"""
+        try:
+            df = self._load_kline_df(stock_symbol, timeframe, adjust_type, latest_count)
+            if df is None or df.empty:
+                return []
+            close = df["c"].astype(float)
+            mid = close.rolling(window=20, min_periods=1).mean()
+            std = close.rolling(window=20, min_periods=1).std().fillna(0)
+            upper = mid + 2 * std
+            lower = mid - 2 * std
+            result = [
+                {
+                    "t": df.iloc[i]["t"],
+                    "u": round(float(upper.iloc[i]), 4),
+                    "m": round(float(mid.iloc[i]), 4),
+                    "d": round(float(lower.iloc[i]), 4),
+                }
+                for i in range(len(df))
+            ]
+            return result[-latest_count:] if latest_count else result
+        except Exception as e:
+            logger.error(f"AKShare get_history_boll({stock_symbol}) 失败: {e}")
+            return []
+
+    # ====== 资金流向 ======
+
+    def get_fund_flow(self, stock_code: str, start_time: str = None,
+                      end_time: str = None, latest_count: int = None) -> List[Dict[str, Any]]:
+        """
+        历史资金流向（个股，按日）
+        AKShare 字段单位是"元"，转换为"万元"以匹配 ZHITU 习惯
+        """
+        code = _strip_market_suffix(stock_code)
+        market = "sh" if code.startswith(("6", "5", "9")) else "sz"
+
+        last_err = None
+        for attempt in range(3):
+            try:
+                df = _akshare().stock_individual_fund_flow(stock=code, market=market)
+                result = []
+                for _, row in df.iterrows():
+                    result.append({
+                        "t": str(row.get("日期", "")),
+                        "p": _safe_float(row.get("收盘价")),
+                        "zf": _safe_float(row.get("涨跌幅")),
+                        # 主力净流入（万元）
+                        "zljlr": round(_safe_float(row.get("主力净流入-净额")) / 10000, 2),
+                        "zljlrzb": _safe_float(row.get("主力净流入-净占比")),
+                        # 超大单
+                        "cddjlr": round(_safe_float(row.get("超大单净流入-净额")) / 10000, 2),
+                        "cddjlrzb": _safe_float(row.get("超大单净流入-净占比")),
+                        # 大单
+                        "ddjlr": round(_safe_float(row.get("大单净流入-净额")) / 10000, 2),
+                        "ddjlrzb": _safe_float(row.get("大单净流入-净占比")),
+                        # 中单
+                        "zdjlr": round(_safe_float(row.get("中单净流入-净额")) / 10000, 2),
+                        "zdjlrzb": _safe_float(row.get("中单净流入-净占比")),
+                        # 小单
+                        "xdjlr": round(_safe_float(row.get("小单净流入-净额")) / 10000, 2),
+                        "xdjlrzb": _safe_float(row.get("小单净流入-净占比")),
+                    })
+                if latest_count and len(result) > latest_count:
+                    result = result[-latest_count:]
+                return result
+            except Exception as e:
+                last_err = e
+                if attempt < 2:
+                    time.sleep(0.5 * (attempt + 1))
+        logger.error(f"AKShare get_fund_flow({code}) 重试 3 次失败: {last_err}")
         return []
+
+    # ====== 板块 / 概念 ======
 
     def get_stock_sectors(self, stock_code: str) -> List[Dict[str, Any]]:
-        return []
+        """
+        股票所属板块（开源版返回行业 + 上市地）
+        ZHITU 返回完整的"行业 + 概念 + 地域"，AKShare 拿不到全量概念
+        """
+        code = _strip_market_suffix(stock_code)
+        try:
+            df = _akshare().stock_individual_info_em(symbol=code)
+            info = {row["item"]: row["value"] for _, row in df.iterrows()}
+            industry = str(info.get("行业", "")).strip()
+            tags = []
+            if industry:
+                tags.append(industry)
+            # 添加交易所标识
+            ex = _infer_exchange(code)
+            if ex == "sh":
+                tags.append("沪市主板" if code.startswith("60") else "科创板")
+            elif ex == "sz":
+                if code.startswith("00"):
+                    tags.append("深市主板")
+                elif code.startswith("30"):
+                    tags.append("创业板")
+            elif ex == "bj":
+                tags.append("北交所")
+            content = " ".join(tags)
+            return [{"keyword": "所属板块", "content": content}] if content else []
+        except Exception as e:
+            logger.warning(f"AKShare get_stock_sectors({code}) 失败: {e}")
+            return []
 
-    def get_history_boll(self, *args, **kwargs) -> List[Dict[str, Any]]:
-        return []
+    # ====== 未实现：历史逐笔 ======
 
-    def get_fund_flow(self, *args, **kwargs) -> List[Dict[str, Any]]:
+    def get_tick_by_tick(self, stock_code: str) -> List[Dict[str, Any]]:
+        """
+        历史逐笔数据：AKShare 不直接支持。
+        当天逐笔请使用 src/tools/tick_data_fetcher.py（东方财富接口）。
+        历史逐笔在开源版返回空，不影响日常推荐（仅影响"历史回测"场景）。
+        """
         return []
 
     def get_real_time_all_broker(self) -> List[Dict[str, Any]]:
