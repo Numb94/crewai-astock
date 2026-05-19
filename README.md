@@ -60,7 +60,7 @@
 | Embeddings | 硅基流动 BAAI/bge-m3 |
 | Web | Flask 3 + Vue3 + Element Plus + ECharts |
 | 数据 | SQLite + SQLAlchemy ORM（15 张表）|
-| 数据源 | 智兔 API（主力）+ 东方财富爬虫（实时行情）+ Tavily（备用新闻） |
+| 数据源 | **AKShare**（默认，免费开源） / 智兔 API（可选付费）+ 东方财富爬虫 + Tavily（备用新闻） |
 
 ## 快速开始
 
@@ -86,26 +86,28 @@ pip install -r requirements.txt
 
 ```bash
 cp .env.example .env
-# 编辑 .env，至少填入：
-#   DEEPSEEK_API_KEY
-#   ZHITU_API_TOKEN
-# 可选：
-#   GROK_API_KEY（实时新闻 / 社区情绪）
-#   SILICONFLOW_API_KEY（Memory 长期记忆）
-#   PUSHPLUS_TOKEN（微信推送）
-#   TAVILY_API_KEY（备用新闻源）
+# 编辑 .env：
+#   DEEPSEEK_API_KEY     # 必需（AI 推理）
+#   其他全是可选
 ```
+
+**股票数据源说明**：
+
+项目内置自动降级 —— **未配置 `ZHITU_API_TOKEN` 时自动使用 AKShare（免费开源）**，开箱即用，无需任何 Key。配置了 ZHITU Token 就自动切换到 ZHITU（数据更稳定）。
 
 **API 申请入口**：
 
-| API | 地址 | 备注 |
-|---|---|---|
-| DeepSeek | https://platform.deepseek.com | 注册送 500 万 tokens |
-| 智兔 API | https://api.zhituapi.cn | 包年版 3000 次/分钟 |
-| Grok | https://x.ai | 实时搜索能力 |
-| 硅基流动 | https://cloud.siliconflow.cn | 注册送 2000 万 tokens |
-| PushPlus | https://www.pushplus.plus | 免费微信推送 |
-| Tavily | https://tavily.com | 每 Key 1000 次/月 |
+| API | 地址 | 状态 | 备注 |
+|---|---|---|---|
+| DeepSeek | https://platform.deepseek.com | ✅ **必需** | AI 推理引擎；注册送 500 万 tokens |
+| AKShare | (无需 Key) | ✅ **默认数据源** | `pip install akshare`，开源免费 |
+| 智兔 API | https://api.zhituapi.cn | 🟡 可选（付费） | 数据稳定性高于 AKShare（爬虫偶发抖动） |
+| Grok / 中转 | https://x.ai 或国内中转 | 🟡 可选 | 新闻 + 社区情绪实时搜索；缺失则该维度走中性 60 分 |
+| 硅基流动 | https://cloud.siliconflow.cn | 🟡 可选 | CrewAI Memory 长期记忆；不配则 Memory 关闭 |
+| PushPlus | https://www.pushplus.plus | 🟡 可选 | 微信推送；不配则只在 Web 内显示 |
+| Tavily | https://tavily.com | 🟡 可选 | 备用新闻源 |
+
+> 💡 **最低运行成本**：只需 DeepSeek（注册送 500 万 tokens）即可跑完整推荐流程。其他全部可不配。
 
 ### 4. 初始化数据库
 
