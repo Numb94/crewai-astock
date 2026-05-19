@@ -1,0 +1,190 @@
+<!-- Quantum Tactical Widget - Compact Mode -->
+{% raw %}
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUANTUM WIDGET</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/element-plus@2.4.4/dist/index.css">
+    <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/element-plus@2.4.4/dist/index.full.js"></script>
+    <style>
+        :root {
+            /* Increased transparency: 0.95 -> 0.85 */
+            --bg-core: rgba(11, 16, 33, 0.85);
+            --neon-cyan: #00ffff;
+            --neon-red: #ff2a2a;
+            --text-main: #ffffff;
+            --text-sub: #94a3b8;
+        }
+        body {
+            margin: 0; padding: 0;
+            background-color: transparent;
+            font-family: 'Rajdhani', 'Noto Sans SC', sans-serif;
+            color: var(--text-main);
+            overflow: hidden;
+        }
+        #app {
+            background: var(--bg-core);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            box-sizing: border-box;
+        }
+        /* Header */
+        .widget-header {
+            padding: 10px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            -webkit-app-region: drag; /* Allow dragging the window */
+        }
+        .logo {
+            font-weight: 700;
+            color: var(--neon-cyan);
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+        .status-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #333;
+            box-shadow: 0 0 5px #333;
+        }
+        .status-dot.online {
+            background: var(--neon-cyan);
+            box-shadow: 0 0 5px var(--neon-cyan);
+        }
+        
+        /* Content */
+        .widget-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        
+        /* Compact Position List */
+        .position-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 2px solid transparent;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .position-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .position-item.profit { border-left-color: var(--neon-red); }
+        .position-item.loss { border-left-color: #00ff00; } /* Chinese Red/Green Logic: Red=Up/Profit */
+
+        .stock-info { display: flex; flex-direction: column; }
+        .stock-name { font-size: 14px; font-weight: bold; }
+        .stock-code { font-size: 10px; color: var(--text-sub); }
+        
+        .profit-info { text-align: right; }
+        .profit-pct { font-size: 14px; font-weight: bold; }
+        .profit-val { font-size: 10px; color: var(--text-sub); }
+        
+        .text-red { color: var(--neon-red); }
+        .text-green { color: #00ff00; }
+
+        /* Footer */
+        .widget-footer {
+            padding: 5px 10px;
+            font-size: 10px;
+            color: var(--text-sub);
+            text-align: center;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 255, 255, 0.2); border-radius: 2px; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="widget-header">
+            <div class="logo">QUANTUM HUD</div>
+            <div class="status-dot" :class="{ online: isConnected }"></div>
+        </div>
+        
+        <div class="widget-content">
+            <div v-if="positions.length === 0" style="text-align: center; padding: 20px; color: #666;">
+                NO ACTIVE POSITIONS
+            </div>
+            
+            <div v-for="pos in positions" :key="pos.id" 
+                 class="position-item" 
+                 :class="{ profit: pos.profit_loss_pct > 0, loss: pos.profit_loss_pct < 0 }">
+                <div class="stock-info">
+                    <span class="stock-name">{{ pos.stock_name }}</span>
+                    <span class="stock-code">{{ pos.stock_code }}</span>
+                </div>
+                <div class="profit-info">
+                    <div class="profit-pct" :class="pos.profit_loss_pct > 0 ? 'text-red' : 'text-green'">
+                        {{ pos.profit_loss_pct > 0 ? '+' : '' }}{{ pos.profit_loss_pct.toFixed(2) }}%
+                    </div>
+                    <div class="profit-val">
+                        ¥{{ pos.profit_loss.toFixed(0) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="widget-footer">
+            LAST UPDATE: {{ lastUpdateTime }}
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, onMounted } = Vue;
+
+        createApp({
+            setup() {
+                const positions = ref([]);
+                const isConnected = ref(false);
+                const lastUpdateTime = ref('--:--:--');
+
+                const fetchPositions = async () => {
+                    try {
+                        const res = await fetch('/api/positions/monitor');
+                        const data = await res.json();
+                        if (data.success) {
+                            positions.value = data.data.positions;
+                            isConnected.value = true;
+                            lastUpdateTime.value = new Date().toLocaleTimeString();
+                        } else {
+                            isConnected.value = false;
+                        }
+                    } catch (e) {
+                        isConnected.value = false;
+                        console.error(e);
+                    }
+                };
+
+                onMounted(() => {
+                    fetchPositions();
+                    setInterval(fetchPositions, 5000); // Refresh every 5s
+                });
+
+                return {
+                    positions,
+                    isConnected,
+                    lastUpdateTime
+                };
+            }
+        }).use(ElementPlus).mount('#app');
+    </script>
+</body>
+</html>
+{% endraw %}

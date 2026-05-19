@@ -1,0 +1,109 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# 虚拟环境
+venv/
+env/
+ENV/
+.venv
+
+# 环境变量
+.env
+.env.local
+.env.*.local
+
+# 日志文件
+logs/
+*.log
+
+# 数据库（含真实交易数据，禁止提交）
+data/*.db
+data/*.db-shm
+data/*.db-wal
+data/*.sqlite
+data/*.sqlite3
+data/backups/
+storage/
+*.db
+*.db-shm
+*.db-wal
+
+# 配置（含凭据）
+ths_config.json
+qmt_config.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 缓存
+.cache/
+*.cache
+
+# 测试覆盖率
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# 系统文件
+.DS_Store
+Thumbs.db
+Desktop.ini
+nul
+
+# 临时文件
+*.tmp
+*.temp
+*.bak
+tmp.png
+
+# 临时测试脚本
+check_*.py
+search_*.py
+
+# 回测数据
+backtest_results/
+*.pickle
+*.pkl
+
+# PushPlus 推送记录
+push_history/
+
+# Claude / 工具元数据
+.claude/
+.spec-workflow/
+.plan/
+
+# 其他
+*.zip
+*.tar.gz

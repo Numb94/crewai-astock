@@ -1,0 +1,32 @@
+{
+  "_comment": "爬虫配置文件 - 默认不使用代理",
+  "_proxy_note": "如需使用巨量IP代理，请参考 crawler_config.example.json 配置示例",
+
+  "CRAWLER_USE_PROXY": false,
+
+  "_giant_ip_config": "巨量IP代理配置 (已禁用，避免连接超时)",
+  "GIANT_IP_API_URL": "",
+  "GIANT_IP_PROTOCOL": "http",
+  "GIANT_IP_CACHE_TTL": 59,
+  "GIANT_IP_MAX_FAILURES": 2,
+  "GIANT_IP_FETCH_TIMEOUT": 8,
+  "GIANT_IP_STATIC_PROXIES": [],
+
+  "_crawler_config": "爬虫基础配置",
+  "CRAWLER_PROXY_DELAY": 0,
+  "CRAWLER_DELAY_SECONDS": 0.5,
+  "CRAWLER_MAX_RETRIES": 3,
+  "CRAWLER_RETRY_DELAY": 0.5,
+  "CRAWLER_RETRY_BACKOFF": 1.5,
+  "REQUEST_TIMEOUT": 10,
+  "CRAWLER_PROXY_POOL_SIZE": 10,
+  "CRAWLER_PROXY_EXPIRY_SECONDS": 170,
+  "CRAWLER_FAIL_THRESHOLD": 5,
+  "CRAWLER_DB_TIMEOUT": 30,
+  "CRAWLER_BATCH_SIZE": 100,
+  "CRAWLER_WORKERS": 10,
+  "CRAWLER_ITEM_RETRIES": 3,
+  "CRAWLER_TICK_INSERT_BATCH": 5000,
+  "CRAWLER_PROCESS_WRITER": true,
+  "CRAWLER_TICK_QUEUE_SIZE": 50
+}

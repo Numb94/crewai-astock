@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CrewAI Stock 管理界面{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Chart.js - 使用UMD版本 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            margin: 0.25rem 0;
+            transition: all 0.3s ease;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .status-badge {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+            transition: box-shadow 0.15s ease-in-out;
+        }
+        .card:hover {
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+        }
+        .loading-spinner {
+            display: none;
+        }
+        .loading .loading-spinner {
+            display: inline-block;
+        }
+        .loading .btn-text {
+            display: none;
+        }
+        .metric-card {
+            border-left: 4px solid #007bff;
+        }
+        .metric-card.success {
+            border-left-color: #28a745;
+        }
+        .metric-card.warning {
+            border-left-color: #ffc107;
+        }
+        .metric-card.danger {
+            border-left-color: #dc3545;
+        }
+    </style>
+
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- 侧边栏 -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h5 class="text-white">
+                            <i class="bi bi-graph-up-arrow"></i>
+                            CrewAI Stock
+                        </h5>
+                        <small class="text-white-50">智能交易系统</small>
+                    </div>
+
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'trading' %}active{% endif %}" href="{{ url_for('trading') }}">
+                                <i class="bi bi-speedometer2 me-2"></i>
+                                智能交易系统
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('index') }}">
+                                <i class="bi bi-house-door me-2"></i>
+                                系统概览
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'trading' %}active{% endif %}" href="{{ url_for('trading') }}">
+                                <i class="bi bi-star-fill me-2"></i>
+                                股票推荐
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="alert('持仓管理功能开发中...'); return false;">
+                                <i class="bi bi-briefcase-fill me-2"></i>
+                                持仓管理
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="alert('交易历史功能开发中...'); return false;">
+                                <i class="bi bi-clock-history me-2"></i>
+                                交易历史
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="alert('数据源功能开发中...'); return false;">
+                                <i class="bi bi-database me-2"></i>
+                                数据源管理
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="alert('数据库功能开发中...'); return false;">
+                                <i class="bi bi-table me-2"></i>
+                                数据库状态
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="alert('通知中心功能开发中...'); return false;">
+                                <i class="bi bi-bell me-2"></i>
+                                推送测试
+                            </a>
+                        </li>
+                    </ul>
+
+                    <hr class="text-white-50">
+
+                    <div class="text-white-50 px-3 small">
+                        <div class="mb-2">
+                            <i class="bi bi-clock me-1"></i>
+                            <span id="current-time">--:--:--</span>
+                        </div>
+                        <div>
+                            <i class="bi bi-info-circle me-1"></i>
+                            版本 v1.0.0
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- 主内容区 -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">{% block page_title %}仪表板{% endblock %}</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="refreshData()">
+                                <i class="bi bi-arrow-clockwise"></i> 刷新
+                            </button>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-sm btn-primary" onclick="checkSystemStatus()">
+                                <i class="bi bi-heart-pulse"></i> 系统状态
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 消息提示 -->
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- 页面内容 -->
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- 通用JavaScript -->
+    <script>
+        // 更新当前时间
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('zh-CN');
+            document.getElementById('current-time').textContent = timeString;
+        }
+
+        // 初始化时间显示
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // 刷新数据
+        function refreshData() {
+            window.location.reload();
+        }
+
+        // 检查系统状态
+        function checkSystemStatus() {
+            fetch('/api/status')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification('系统状态正常', 'success');
+                    } else {
+                        showNotification('系统状态异常: ' + data.error, 'danger');
+                    }
+                })
+                .catch(error => {
+                    showNotification('获取系统状态失败: ' + error, 'danger');
+                });
+        }
+
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            const container = document.querySelector('main');
+            container.insertBefore(alertDiv, container.firstChild);
+
+            // 3秒后自动消失
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 3000);
+        }
+
+        // 加载状态管理
+        function setLoading(button, loading = true) {
+            if (loading) {
+                button.classList.add('loading');
+                button.disabled = true;
+            } else {
+                button.classList.remove('loading');
+                button.disabled = false;
+            }
+        }
+
+        // 格式化数字
+        function formatNumber(num) {
+            if (num === null || num === undefined) return '--';
+            return new Intl.NumberFormat('zh-CN').format(num);
+        }
+
+        // 格式化百分比
+        function formatPercentage(num) {
+            if (num === null || num === undefined) return '--';
+            return (num > 0 ? '+' : '') + num.toFixed(2) + '%';
+        }
+
+        // 格式化日期时间
+        function formatDateTime(dateString) {
+            if (!dateString) return '--';
+            const date = new Date(dateString);
+            return date.toLocaleString('zh-CN');
+        }
+
+        // 获取状态颜色
+        function getStatusColor(status) {
+            const colors = {
+                'success': 'success',
+                'error': 'danger',
+                'warning': 'warning',
+                'info': 'info',
+                'available': 'success',
+                'unavailable': 'danger',
+                'holding': 'primary',
+                'sold': 'secondary'
+            };
+            return colors[status] || 'secondary';
+        }
+
+        // 页面加载完成后的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 自动检查系统状态
+            setTimeout(checkSystemStatus, 1000);
+        });
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

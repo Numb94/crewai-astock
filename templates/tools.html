@@ -1,0 +1,565 @@
+{% raw %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI工具 - CrewAI Stock</title>
+
+    <!-- Element Plus CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css">
+
+    <!-- Markdown渲染 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@11.0.0/marked.min.js"></script>
+
+    <!-- 代码高亮 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/highlight.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #f3f5f7;
+            min-height: 100vh;
+        }
+
+        #app {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 32px 40px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+        }
+
+        .header h1 {
+            color: #111827;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .main-card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .tab-content {
+            padding: 20px;
+            min-height: 600px;
+        }
+
+        /* AI分析过程样式 */
+        .chat-messages {
+            max-height: 700px;
+            overflow-y: auto;
+        }
+
+        .chat-message {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f9fafb;
+            border-left: 3px solid #60A5FA;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .message-role {
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .message-content {
+            color: #374151;
+            line-height: 1.6;
+        }
+
+        /* 股票评估样式 */
+        .evaluation-result {
+            padding: 15px;
+            border-radius: 8px;
+            background: #f9fafb;
+            margin-bottom: 15px;
+        }
+
+        .result-header {
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .result-body {
+            color: #374151;
+            line-height: 1.6;
+        }
+
+        /* 交易记录样式 */
+        .transaction-filters {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #909399;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        /* 加载状态 */
+        .loading-state {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            #app {
+                padding: 10px;
+            }
+            .header {
+                padding: 20px;
+            }
+            .tab-content {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="header">
+            <h1>🤖 AI工具中心</h1>
+            <p>AI分析过程 | 股票智能评估 | 交易记录</p>
+        </div>
+
+        <el-card class="main-card">
+            <el-tabs v-model="activeTab" type="border-card">
+                <!-- Tab 1: AI分析过程 -->
+                <el-tab-pane label="📊 AI分析过程" name="analysis">
+                    <div class="tab-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <h3 style="margin: 0;">分析记录</h3>
+                                <el-tag v-if="eventSource" type="success" effect="dark" size="small">
+                                    监听中
+                                </el-tag>
+                                <el-tag v-else type="info" effect="plain" size="small">未连接</el-tag>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <el-button v-if="!eventSource" type="primary" size="small" @click="connectAnalysisSSE">
+                                    开始监听
+                                </el-button>
+                                <el-button v-else type="warning" size="small" @click="disconnectAnalysisSSE">
+                                    停止监听
+                                </el-button>
+                                <el-button size="small" @click="clearAnalysisMessages">清空</el-button>
+                            </div>
+                        </div>
+
+                        <div v-if="analysisMessages.length === 0" class="empty-state">
+                            <i class="el-icon-chat-line-square"></i>
+                            <p v-if="!eventSource">点击"开始监听"按钮，然后在主页运行AI推荐</p>
+                            <p v-else>等待AI分析数据...</p>
+                            <p style="font-size: 14px; color: #909399; margin-top: 10px;">
+                                💡 提示：需要先在主页点击"运行AI推荐"，分析过程才会在此显示
+                            </p>
+                        </div>
+
+                        <div v-else class="chat-messages">
+                            <div v-for="(msg, index) in analysisMessages" :key="index" class="chat-message">
+                                <div class="message-header">
+                                    <span class="message-role">👤 {{ msg.role }}</span>
+                                    <span class="message-time">{{ msg.timestamp }}</span>
+                                </div>
+                                <div class="message-content" v-html="renderMarkdown(msg.content)"></div>
+                            </div>
+                        </div>
+                    </div>
+                </el-tab-pane>
+
+                <!-- Tab 2: 股票智能评估 -->
+                <el-tab-pane label="🔍 股票智能评估" name="evaluation">
+                    <div class="tab-content">
+                        <div style="margin-bottom: 20px;">
+                            <el-input
+                                v-model="stockCode"
+                                placeholder="请输入股票代码（如：600000）"
+                                @keyup.enter="evaluateStock"
+                                style="max-width: 400px;"
+                            >
+                                <template #append>
+                                    <el-button
+                                        type="primary"
+                                        @click="evaluateStock"
+                                        :loading="evaluating"
+                                    >
+                                        开始评估
+                                    </el-button>
+                                </template>
+                            </el-input>
+                        </div>
+
+                        <div v-if="evaluating" class="loading-state">
+                            <el-icon class="is-loading" style="font-size: 32px; margin-bottom: 10px;">
+                                <i class="el-icon-loading"></i>
+                            </el-icon>
+                            <p>AI正在分析中...</p>
+                        </div>
+
+                        <div v-else-if="evaluationResults.length === 0" class="empty-state">
+                            <i class="el-icon-search"></i>
+                            <p>输入股票代码开始评估</p>
+                            <p style="font-size: 14px; margin-top: 10px;">AI将从技术面、资金面、基本面等多维度进行分析</p>
+                        </div>
+
+                        <div v-else>
+                            <div v-for="(result, index) in evaluationResults" :key="index" class="evaluation-result">
+                                <div class="result-header">{{ result.agent }}</div>
+                                <div class="result-body" v-html="renderMarkdown(result.content)"></div>
+                            </div>
+                        </div>
+                    </div>
+                </el-tab-pane>
+
+                <!-- Tab 3: 交易记录 -->
+                <el-tab-pane label="📈 交易记录" name="transactions">
+                    <div class="tab-content">
+                        <div class="transaction-filters">
+                            <el-select v-model="transactionType" placeholder="交易类型" style="width: 150px;" @change="loadTransactions">
+                                <el-option label="全部" value=""></el-option>
+                                <el-option label="买入" value="buy"></el-option>
+                                <el-option label="卖出" value="sell"></el-option>
+                            </el-select>
+
+                            <el-date-picker
+                                v-model="dateRange"
+                                type="daterange"
+                                range-separator="至"
+                                start-placeholder="开始日期"
+                                end-placeholder="结束日期"
+                                @change="loadTransactions"
+                                style="width: 300px;"
+                            />
+
+                            <el-button type="primary" @click="loadTransactions">查询</el-button>
+                            <el-button @click="resetFilters">重置</el-button>
+                        </div>
+
+                        <el-table
+                            :data="transactions"
+                            v-loading="loadingTransactions"
+                            style="width: 100%"
+                            stripe
+                        >
+                            <el-table-column prop="trade_date" label="交易日期" width="120" />
+                            <el-table-column prop="stock_code" label="股票代码" width="100" />
+                            <el-table-column prop="stock_name" label="股票名称" width="120" />
+                            <el-table-column prop="trade_type" label="交易类型" width="100">
+                                <template #default="scope">
+                                    <el-tag :type="scope.row.trade_type.toUpperCase() === 'BUY' ? 'danger' : 'success'">
+                                        {{ scope.row.trade_type.toUpperCase() === 'BUY' ? '买入' : '卖出' }}
+                                    </el-tag>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="quantity" label="数量" width="100" />
+                            <el-table-column prop="price" label="价格" width="100">
+                                <template #default="scope">
+                                    ¥{{ (scope.row.price || 0).toFixed(2) }}
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="amount" label="金额" width="120">
+                                <template #default="scope">
+                                    ¥{{ (scope.row.amount || 0).toFixed(2) }}
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="profit_loss" label="盈亏" width="120">
+                                <template #default="scope">
+                                    <span v-if="scope.row.profit_loss !== null && scope.row.profit_loss !== undefined"
+                                          :style="{color: scope.row.profit_loss >= 0 ? '#f56c6c' : '#67c23a'}">
+                                        {{ scope.row.profit_loss >= 0 ? '+' : '' }}¥{{ scope.row.profit_loss.toFixed(2) }}
+                                    </span>
+                                    <span v-else style="color: #909399;">-</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="strategy_used" label="策略" width="120" />
+                        </el-table>
+                        </el-table>
+
+                        <div v-if="transactions.length === 0 && !loadingTransactions" class="empty-state">
+                            <i class="el-icon-document"></i>
+                            <p>暂无交易记录</p>
+                        </div>
+                    </div>
+                </el-tab-pane>
+            </el-tabs>
+        </el-card>
+    </div>
+
+    <!-- Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- Element Plus -->
+    <script src="https://unpkg.com/element-plus"></script>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    activeTab: 'analysis',
+
+                    // AI分析过程
+                    analysisMessages: [],
+                    eventSource: null,
+
+                    // 股票智能评估
+                    stockCode: '',
+                    evaluating: false,
+                    evaluationResults: [],
+                    evaluationEventSource: null,
+
+                    // 交易记录
+                    transactions: [],
+                    loadingTransactions: false,
+                    transactionType: '',
+                    dateRange: null
+                };
+            },
+
+            mounted() {
+                // 不自动连接AI分析SSE，等待用户主动触发
+                // 只在用户点击"开始监听"按钮时才连接
+
+                // 加载交易记录
+                this.loadTransactions();
+            },
+
+            beforeUnmount() {
+                // 关闭SSE连接
+                if (this.eventSource) {
+                    this.eventSource.close();
+                }
+                if (this.evaluationEventSource) {
+                    this.evaluationEventSource.close();
+                }
+            },
+
+            methods: {
+                // ========== AI分析过程 ==========
+                connectAnalysisSSE() {
+                    const sessionId = this.getCookie('session_id') || 'default';
+
+                    if (this.eventSource) {
+                        this.eventSource.close();
+                    }
+
+                    this.eventSource = new EventSource(`/api/crew/stream/${sessionId}`);
+                    ElementPlus.ElMessage.success('已开始监听AI分析，请在主页运行AI推荐');
+
+                    this.eventSource.onmessage = (event) => {
+                        try {
+                            const data = JSON.parse(event.data);
+                            this.analysisMessages.push({
+                                role: data.role || 'System',
+                                content: data.content || '',
+                                timestamp: new Date().toLocaleTimeString()
+                            });
+
+                            // 自动滚动到底部
+                            this.$nextTick(() => {
+                                const container = document.querySelector('.chat-messages');
+                                if (container) {
+                                    container.scrollTop = container.scrollHeight;
+                                }
+                            });
+                        } catch (error) {
+                            console.error('解析SSE消息失败:', error);
+                        }
+                    };
+
+                    this.eventSource.onerror = (error) => {
+                        console.error('SSE连接错误:', error);
+                        // 5秒后重连
+                        setTimeout(() => {
+                            this.connectAnalysisSSE();
+                        }, 5000);
+                    };
+                },
+
+                disconnectAnalysisSSE() {
+                    if (this.eventSource) {
+                        this.eventSource.close();
+                        this.eventSource = null;
+                        ElementPlus.ElMessage.success('已停止监听AI分析');
+                    }
+                },
+
+                clearAnalysisMessages() {
+                    this.analysisMessages = [];
+                    ElementPlus.ElMessage.success('已清空分析记录');
+                },
+
+                // ========== 股票智能评估 ==========
+                async evaluateStock() {
+                    if (!this.stockCode.trim()) {
+                        ElementPlus.ElMessage.warning('请输入股票代码');
+                        return;
+                    }
+
+                    this.evaluating = true;
+                    this.evaluationResults = [];
+
+                    const sessionId = this.getCookie('session_id') || 'default';
+
+                    if (this.evaluationEventSource) {
+                        this.evaluationEventSource.close();
+                    }
+
+                    this.evaluationEventSource = new EventSource(
+                        `/api/stock/evaluate?stock_codes=${encodeURIComponent(this.stockCode.trim())}&session_id=${sessionId}`
+                    );
+
+                    this.evaluationEventSource.onmessage = (event) => {
+                        try {
+                            const data = JSON.parse(event.data);
+
+                            if (data.type === 'agent_output') {
+                                this.evaluationResults.push({
+                                    agent: data.agent || 'AI Agent',
+                                    content: data.content || ''
+                                });
+                            } else if (data.type === 'complete') {
+                                this.evaluating = false;
+                                this.evaluationEventSource.close();
+                                ElementPlus.ElMessage.success('评估完成');
+                            } else if (data.type === 'error') {
+                                this.evaluating = false;
+                                this.evaluationEventSource.close();
+                                ElementPlus.ElMessage.error(data.message || '评估失败');
+                            }
+                        } catch (error) {
+                            console.error('解析评估结果失败:', error);
+                        }
+                    };
+
+                    this.evaluationEventSource.onerror = (error) => {
+                        console.error('评估SSE连接错误:', error);
+                        this.evaluating = false;
+                        if (this.evaluationEventSource) {
+                            this.evaluationEventSource.close();
+                        }
+                    };
+                },
+
+                // ========== 交易记录 ==========
+                async loadTransactions() {
+                    this.loadingTransactions = true;
+
+                    try {
+                        const sessionId = this.getCookie('session_id') || 'default';
+                        let url = `/api/transactions?session_id=${sessionId}`;
+
+                        if (this.transactionType) {
+                            url += `&type=${this.transactionType}`;
+                        }
+
+                        if (this.dateRange && this.dateRange.length === 2) {
+                            const startDate = this.formatDate(this.dateRange[0]);
+                            const endDate = this.formatDate(this.dateRange[1]);
+                            url += `&start_date=${startDate}&end_date=${endDate}`;
+                        }
+
+                        const response = await fetch(url);
+                        const data = await response.json();
+
+                        if (data.success) {
+                            this.transactions = data.transactions || [];
+                        } else {
+                            ElementPlus.ElMessage.error(data.message || '加载交易记录失败');
+                        }
+                    } catch (error) {
+                        console.error('加载交易记录失败:', error);
+                        ElementPlus.ElMessage.error('加载交易记录失败');
+                    } finally {
+                        this.loadingTransactions = false;
+                    }
+                },
+
+                resetFilters() {
+                    this.transactionType = '';
+                    this.dateRange = null;
+                    this.loadTransactions();
+                },
+
+                formatDate(date) {
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                },
+
+                // ========== 工具方法 ==========
+                renderMarkdown(content) {
+                    if (!content) return '';
+
+                    const html = marked.parse(content);
+
+                    // 代码高亮
+                    this.$nextTick(() => {
+                        document.querySelectorAll('pre code').forEach((block) => {
+                            hljs.highlightElement(block);
+                        });
+                    });
+
+                    return html;
+                },
+
+                getCookie(name) {
+                    const value = `; ${document.cookie}`;
+                    const parts = value.split(`; ${name}=`);
+                    if (parts.length === 2) return parts.pop().split(';').shift();
+                    return null;
+                }
+            }
+        }).use(ElementPlus).mount('#app');
+    </script>
+</body>
+</html>
+{% endraw %}
+

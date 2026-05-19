@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}页面未找到 - CrewAI Stock 管理界面{% endblock %}
+
+{% block page_title %}页面未找到{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="text-center">
+            <div class="error mx-auto" data-text="404">404</div>
+            <p class="lead text-gray-800 mb-5">页面未找到</p>
+            <p class="text-gray-500 mb-0">看起来您访问的页面不存在...</p>
+            <a href="{{ url_for('index') }}">&larr; 返回首页</a>
+        </div>
+    </div>
+</div>
+
+<style>
+.error {
+    font-size: 7rem;
+    position: relative;
+    line-height: 1;
+    width: 12.5rem;
+}
+</style>
+{% endblock %}

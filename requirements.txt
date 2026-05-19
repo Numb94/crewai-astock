@@ -1,0 +1,48 @@
+# === AI 框架 ===
+crewai>=0.95.0
+langchain>=0.3.0
+langchain-community>=0.3.0
+pydantic>=2.5.0
+
+# === LLM ===
+# DeepSeek / Grok 通过 OpenAI SDK 调用
+openai>=1.0.0
+
+# === 数据源 API ===
+requests>=2.31.0
+tavily-python>=0.5.0
+feedparser>=6.0.0  # 备用 RSS 解析
+
+# === 数据库 ===
+sqlalchemy>=2.0.0
+alembic>=1.12.0
+
+# === 数据处理 ===
+pandas>=2.2.0
+numpy>=2.0.0
+
+# === Web 可视化 ===
+flask>=3.0.0
+jinja2>=3.1.0
+Werkzeug>=2.3.0
+
+# === 日志 ===
+loguru>=0.7.0
+
+# === 工具库 ===
+python-dotenv>=1.0.0
+pyyaml>=6.0.0
+httpx>=0.27.0
+schedule>=1.2.0
+
+# === 测试 ===
+pytest>=8.0.0
+pytest-cov>=4.1.0
+pytest-mock>=3.12.0
+
+# === 回测（可选） ===
+backtrader>=1.9.78.123
+
+# === 其他 ===
+python-dateutil>=2.8.0
+pytz>=2024.1
