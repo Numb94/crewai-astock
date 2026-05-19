@@ -66,15 +66,33 @@ class DatabaseManager:
         # ✅ 自动建表（幂等：已存在的表不会被修改 / 重建）
         # 避免开源用户首次启动时遇到 "no such table" 错误
         try:
-            from sqlalchemy import inspect
+            from sqlalchemy import inspect, text
             inspector = inspect(self.engine)
             existing_tables = set(inspector.get_table_names())
             expected_tables = set(Base.metadata.tables.keys())
             missing = expected_tables - existing_tables
             if missing:
-                logger.info(f"📦 检测到 {len(missing)} 张表缺失，自动建表: {sorted(missing)}")
+                logger.info(f"📦 检测到 {len(missing)} 张 ORM 表缺失，自动建表: {sorted(missing)}")
                 Base.metadata.create_all(self.engine)
-                logger.success(f"✅ 数据库表已就绪（共 {len(expected_tables)} 张）")
+
+            # 非 ORM 表：stock_basic_info（换手率计算用）
+            # 数据由 scripts/init_stock_basic_info.py 填充，这里只确保表存在
+            if 'stock_basic_info' not in existing_tables:
+                with self.engine.begin() as conn:
+                    conn.execute(text("""
+                        CREATE TABLE IF NOT EXISTS stock_basic_info (
+                            stock_code TEXT PRIMARY KEY,
+                            stock_name TEXT,
+                            float_shares REAL,
+                            total_shares REAL,
+                            list_date TEXT,
+                            update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                        )
+                    """))
+                logger.info("📦 已创建非 ORM 表: stock_basic_info（运行 scripts/init_stock_basic_info.py 可填充数据）")
+
+            if missing or 'stock_basic_info' not in existing_tables:
+                logger.success(f"✅ 数据库表已就绪")
         except Exception as e:
             logger.error(f"⚠️ 自动建表失败: {e}（请手动运行 python -m src.database.init_db）")
 
