@@ -27,10 +27,10 @@ from enum import Enum
 import json
 from functools import wraps
 
-# 导入三个数据源
+# 导入数据源（MCP Aktools 客户端在开源版本中已移除，下面的代码会自动跳过 MCP 分支）
 from .zhitu_api import ZhituAPI, create_zhitu_client
-from .mcp_client import create_mcp_solution_client as create_mcp_client
 from .eastmoney_crawler import EastMoneyCrawler, create_eastmoney_crawler
+create_mcp_client = None  # MCP 已移除，保留变量名以兼容下面的判断
 
 # 配置日志
 logger = logging.getLogger(__name__)
@@ -174,17 +174,9 @@ class DataSourceManager:
                 self.status[DataSource.ZHITU].last_error = str(e)
                 logger.error(f"智兔API客户端初始化失败: {e}")
 
-        # 初始化MCP客户端
-        if self.config['sources']['mcp']['enabled']:
-            try:
-                self.mcp_client = create_mcp_client(enable_mcp_tools=True)
-                env_info = self.mcp_client.get_environment_info()
-                self.status[DataSource.MCP].available = True
-                logger.info(f"MCP客户端初始化成功 - MCP环境: {env_info['mcp_environment']}, 可用工具: {env_info['available_tools']}个")
-            except Exception as e:
-                self.status[DataSource.MCP].available = False
-                self.status[DataSource.MCP].last_error = str(e)
-                logger.error(f"MCP客户端初始化失败: {e}")
+        # MCP 客户端在开源版本中已移除，此分支恒为禁用
+        self.mcp_client = None
+        self.status[DataSource.MCP].available = False
 
         # 初始化东方财富爬虫
         if self.config['sources']['eastmoney']['enabled']:

@@ -8,12 +8,17 @@ from datetime import date
 from decimal import Decimal
 from src.database.db_manager import get_db
 from src.database.models import Candidate
-from src.tools.zhitu_api import ZhituAPI
 
 recommendation_api = Blueprint('recommendation_api', __name__)
 
-# 初始化智兔API
-zhitu = ZhituAPI()
+# 智兔 API 延迟初始化（仅在需要实时价格时才加载，避免 import 时强制要求 token）
+_zhitu = None
+def _get_zhitu():
+    global _zhitu
+    if _zhitu is None:
+        from src.tools.zhitu_api import ZhituAPI
+        _zhitu = ZhituAPI()
+    return _zhitu
 
 
 @recommendation_api.route('/api/recommendations/latest', methods=['GET'])
@@ -96,7 +101,7 @@ def get_latest_recommendations():
                 try:
                     print(f"🔍 准备批量获取实时价格，股票代码: {stock_codes}")
                     # 使用券商数据源批量获取实时价格
-                    prices_data = zhitu.get_real_time_multi_broker(stock_codes)
+                    prices_data = _get_zhitu().get_real_time_multi_broker(stock_codes)
                     print(f"📊 API返回数据: {prices_data}")
                     if prices_data:
                         for stock_code, price_info in prices_data.items():
