@@ -168,6 +168,12 @@ crewai-astock/
 | CrewAI / LangChain / Flask / SQLAlchemy | MIT / BSD |
 | 智兔 API / DeepSeek / Grok / 硅基流动 / Tavily / PushPlus | 各自服务条款，使用前请阅读 |
 
+## 社区讨论
+
+🔗 Linux.do 开源推广帖：https://linux.do/t/topic/2205861
+
+欢迎来贴讨论 / 反馈 / 吐槽。
+
 ## License
 
 MIT License — 详见 [LICENSE](LICENSE)。
