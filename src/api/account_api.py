@@ -16,26 +16,33 @@ account_api = Blueprint('account_api', __name__)
 
 def _sync_account_for_realtime_user(user_session_id):
     """
-    读取数据库中缓存的账户资金信息（SystemConfig 表）
+    读取数据库中缓存的 broker 同步账户信息（SystemConfig 表）
+
+    仅在曾经有 broker 实盘同步过数据时返回结果；否则返回 None，
+    让 GET /api/account/info 走 account_capital JSON 配置的回退分支。
 
     Args:
         user_session_id: 用户session_id
 
     Returns:
-        dict: 账户信息 或 None（若未配置）
+        dict: broker 同步过的账户信息 或 None
     """
     try:
-        # 从数据库读取资金信息（SystemConfig 表）
-        # 资金信息在以下时机同步到数据库：
-        # 1. 首次启动时
-        # 2. 买入完成后
-        # 3. 卖出完成后
         from src.database.db_manager import get_db
         from src.database.models import Position, SystemConfig
 
         db = get_db()
 
         with db.get_session() as session:
+            # 检查是否有 broker 同步过的数据（account_总资产 是 broker 同步的标志键）
+            # 开源版本无 broker，此键永远不存在 → 返回 None 让上层走 DB-config 分支
+            broker_marker = session.query(SystemConfig).filter(
+                SystemConfig.session_id == user_session_id,
+                SystemConfig.config_key == 'account_总资产'
+            ).first()
+            if not broker_marker:
+                return None
+
             # 查询持仓
             positions = session.query(Position).filter(
                 Position.session_id == user_session_id,
