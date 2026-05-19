@@ -546,9 +546,19 @@ def save_recommendations_to_db(recommendations_json: str) -> str:
                     new_final_score = stock.get('final_score', 0)
                     if new_final_score > (existing.final_score or 0):
                         existing.final_score = new_final_score
-                        existing.cto_score = stock.get('tech_score', 0)
+                        # 🔴 LLM 输出可能用 'technical_score' 或 'tech_score' 两种命名，兼容
+                        existing.cto_score = stock.get('technical_score', stock.get('tech_score', 0))
                         existing.cfo_score = stock.get('fund_score', 0)
                         existing.cmo_score = stock.get('fundamental_score', 0)
+                        # CSO = 新闻面与社区情绪的平均（若都缺则保持 None）
+                        _news = stock.get('news_score')
+                        _comm = stock.get('community_sentiment_score')
+                        if _news is not None and _comm is not None:
+                            existing.cso_score = (float(_news) + float(_comm)) / 2
+                        elif _news is not None:
+                            existing.cso_score = float(_news)
+                        elif _comm is not None:
+                            existing.cso_score = float(_comm)
                         existing.ceo_decision = stock.get('decision', 'BUY')
 
                     # 合并策略名称
@@ -558,6 +568,18 @@ def save_recommendations_to_db(recommendations_json: str) -> str:
                     logger.info(f"  🔄 合并推荐: {stock_code} {stock['name']} (策略: {strategy_name}, 更新推荐价:{existing.recommend_price})")
                 else:
                     # 🔴 不存在，新增推荐（使用调整后的交易日时间）
+                    # CSO = 新闻面与社区情绪的平均
+                    _news = stock.get('news_score')
+                    _comm = stock.get('community_sentiment_score')
+                    if _news is not None and _comm is not None:
+                        _cso = (float(_news) + float(_comm)) / 2
+                    elif _news is not None:
+                        _cso = float(_news)
+                    elif _comm is not None:
+                        _cso = float(_comm)
+                    else:
+                        _cso = None
+
                     candidate = Candidate(
                         session_id=session_id,  # ✅ 添加session_id
                         stock_code=stock_code,
@@ -568,9 +590,11 @@ def save_recommendations_to_db(recommendations_json: str) -> str:
                         can_sell_date=can_sell_date,  # ✅ 使用调整后的T+1日期
                         strategy_name=strategy_name,  # ✅ 直接保存策略名称
                         final_score=stock.get('final_score', 0),
-                        cto_score=stock.get('tech_score', 0),
+                        # 🔴 LLM 输出可能用 'technical_score' 或 'tech_score'，兼容两种
+                        cto_score=stock.get('technical_score', stock.get('tech_score', 0)),
                         cfo_score=stock.get('fund_score', 0),
                         cmo_score=stock.get('fundamental_score', 0),
+                        cso_score=_cso,
                         ceo_decision=stock.get('decision', 'BUY'),
                         ceo_reason=f"【{strategy_name}】{stock.get('reason', '')}",  # ✅ 添加策略标签
                         cro_approved=stock.get('cro_approved', True),
