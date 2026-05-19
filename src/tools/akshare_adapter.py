@@ -223,31 +223,36 @@ class AKShareAdapter:
         if start_time:
             start = start_time[:8]
         else:
-            # 默认拉一年
             now = datetime.now()
             start = now.replace(year=now.year - 1).strftime("%Y%m%d")
 
-        try:
-            df = _akshare().stock_zh_a_hist(
-                symbol=code, period=period,
-                start_date=start, end_date=end, adjust=adjust,
-            )
-            return [
-                {
-                    "t": str(row["日期"]),
-                    "o": _safe_float(row["开盘"]),
-                    "h": _safe_float(row["最高"]),
-                    "l": _safe_float(row["最低"]),
-                    "c": _safe_float(row["收盘"]),
-                    "v": _safe_int(row["成交量"]),
-                    "e": _safe_float(row["成交额"]),
-                    "zf": _safe_float(row.get("涨跌幅")),
-                }
-                for _, row in df.iterrows()
-            ]
-        except Exception as e:
-            logger.error(f"AKShare get_history_timeframe({code}) 失败: {e}")
-            return []
+        # 重试 3 次（东方财富偶发切连接）
+        last_err = None
+        for attempt in range(3):
+            try:
+                df = _akshare().stock_zh_a_hist(
+                    symbol=code, period=period,
+                    start_date=start, end_date=end, adjust=adjust,
+                )
+                return [
+                    {
+                        "t": str(row["日期"]),
+                        "o": _safe_float(row["开盘"]),
+                        "h": _safe_float(row["最高"]),
+                        "l": _safe_float(row["最低"]),
+                        "c": _safe_float(row["收盘"]),
+                        "v": _safe_int(row["成交量"]),
+                        "e": _safe_float(row["成交额"]),
+                        "zf": _safe_float(row.get("涨跌幅")),
+                    }
+                    for _, row in df.iterrows()
+                ]
+            except Exception as e:
+                last_err = e
+                if attempt < 2:
+                    time.sleep(0.5 * (attempt + 1))
+        logger.error(f"AKShare get_history_timeframe({code}) 重试 3 次失败: {last_err}")
+        return []
 
     def get_latest_timeframe(self, stock_symbol: str, timeframe: str = "d",
                              adjust_type: str = "n", limit: int = None) -> List[Dict[str, Any]]:
