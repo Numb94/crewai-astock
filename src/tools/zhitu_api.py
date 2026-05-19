@@ -52,6 +52,17 @@ class ZhituAPI:
     - 请求缓存优化
     """
 
+    def __new__(cls, base_url: str = None, token: str = None):
+        """
+        若 ZHITU_API_TOKEN 未配置，自动降级到 AKShareAdapter（开源数据源，无需 token）。
+        """
+        actual_token = (token or os.getenv('ZHITU_API_TOKEN', '') or '').strip()
+        if not actual_token or actual_token.startswith('your_'):
+            from src.tools.akshare_adapter import AKShareAdapter
+            logger.info("ZHITU_API_TOKEN 未配置，自动使用 AKShare 适配器（pip install akshare）")
+            return AKShareAdapter()
+        return super().__new__(cls)
+
     def __init__(self, base_url: str = None, token: str = None):
         """
         初始化智兔API客户端
@@ -64,6 +75,7 @@ class ZhituAPI:
         self.token = token or os.getenv('ZHITU_API_TOKEN')
 
         if not self.token:
+            # 不会走到这里 — __new__ 已经做了降级
             raise ValueError("智兔API Token未配置，请设置ZHITU_API_TOKEN环境变量")
 
         # 速率限制管理 (包年版: 3000次/分钟)
