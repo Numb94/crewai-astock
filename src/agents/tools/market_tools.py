@@ -19,6 +19,46 @@ logger = logging.getLogger(__name__)
 
 
 # ========================================
+# 风险检测辅助函数（模块级，方便跨作用域复用）
+# 备注：相同名字也作为嵌套函数定义在某些大函数内部，模块级版本兜底跨作用域调用
+# ========================================
+def detect_main_force_selling(main_net_inflow: float, buy_sell_ratio: float, turnover_rate: float) -> Dict:
+    """检测主力出货"""
+    try:
+        main_outflow = abs(main_net_inflow) if main_net_inflow < 0 else 0
+        if main_outflow > 5000 and buy_sell_ratio < 1.0 and turnover_rate > 15:
+            return {'is_selling': True, 'risk_level': 'HIGH',
+                    'description': f'🔴 主力净流出{main_outflow:.0f}万，买卖比{buy_sell_ratio:.2f}，换手率{turnover_rate:.1f}%，明显出货'}
+        elif main_outflow > 3000 and buy_sell_ratio < 0.95:
+            return {'is_selling': True, 'risk_level': 'MEDIUM',
+                    'description': f'⚠️ 主力净流出{main_outflow:.0f}万，买卖比{buy_sell_ratio:.2f}，疑似出货'}
+        elif main_outflow > 5000:
+            return {'is_selling': True, 'risk_level': 'MEDIUM',
+                    'description': f'⚠️ 主力净流出{main_outflow:.0f}万，资金流出较大'}
+        else:
+            return {'is_selling': False, 'risk_level': 'LOW', 'description': '✅ 主力资金正常'}
+    except Exception as e:
+        logger.error(f"主力出货检测失败: {e}")
+        return {'is_selling': False, 'risk_level': 'LOW', 'description': '检测失败'}
+
+
+def detect_trend_conflict(kline_60d: str, kline_60m: str, kline_15m: str, kline_5m: str) -> list:
+    """检测多周期趋势冲突"""
+    try:
+        conflicts = []
+        if '上升' in kline_60d and '下降' in kline_60m:
+            conflicts.append({'type': '日线-60分钟冲突', 'risk_level': 'MEDIUM',
+                              'description': '⚠️ 日线上升但60分钟转弱，短期回调风险'})
+        if '上升' in kline_60d and '下降' in kline_15m and '下降' in kline_5m:
+            conflicts.append({'type': '多周期转弱', 'risk_level': 'HIGH',
+                              'description': '🔴 日线上升但分钟级全面转弱，警惕回调'})
+        return conflicts
+    except Exception as e:
+        logger.error(f"趋势冲突检测失败: {e}")
+        return []
+
+
+# ========================================
 # LLM板块匹配缓存（避免重复调用LLM）
 # ========================================
 _llm_sector_match_cache: Dict[str, Set[str]] = {}
