@@ -6,7 +6,7 @@
     
 定时任务（每日17:00执行）：
     crontab -e
-    0 17 * * 1-5 cd /path/to/crewAi_stock && python src/utils/update_recommendation_performance.py
+    0 17 * * 1-5 cd /path/to/crewai-astock && python src/utils/update_recommendation_performance.py
 """
 
 import sys

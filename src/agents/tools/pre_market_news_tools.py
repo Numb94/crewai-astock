@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-盘前新闻推荐工具 - CrewAI Stock V2.0
+盘前新闻推荐工具 - CrewAI A-Stock V2.0
 
 描述: 基于重大利好新闻，在盘前推荐涨停潜力股
 核心策略：

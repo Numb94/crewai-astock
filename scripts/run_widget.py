@@ -36,7 +36,7 @@ def start_webview():
     webview.start()
 
 if __name__ == '__main__':
-    print("Checking for CrewAI Stock Server...")
+    print("Checking for CrewAI A-Stock Server...")
     if not check_server():
         print(f"Error: Flask server not running at {WIDGET_URL}")
         print("Please run 'python app.py' in a separate terminal first.")

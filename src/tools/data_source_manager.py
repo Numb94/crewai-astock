@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-数据源管理器 - CrewAI Stock V2.0
+数据源管理器 - CrewAI A-Stock V2.0
 
 描述: 统一管理智兔API、MCP Aktools、东方财富爬虫三个数据源
 实现智能数据源选择、容错机制和负载均衡策略

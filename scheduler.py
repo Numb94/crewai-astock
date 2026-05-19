@@ -1,5 +1,5 @@
 """
-CrewAI Stock 调度器
+CrewAI A-Stock 调度器
 自动化运行股票推荐和持仓监控
 
 功能：

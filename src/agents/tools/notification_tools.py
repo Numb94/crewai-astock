@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-CrewAI Stock - 推送通知工具
+CrewAI A-Stock - 推送通知工具
 
 为CrewAI Agent提供微信推送通知能力
 """
@@ -69,7 +69,7 @@ def send_stock_recommendation(recommendations: str) -> str:
             html_content = f"""
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
     <h2 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">
-        📈 CrewAI Stock 今日推荐
+        📈 CrewAI A-Stock 今日推荐
     </h2>
 
     <div style="background: #ecf0f1; padding: 15px; border-radius: 5px; margin: 15px 0;">
@@ -280,7 +280,7 @@ def send_stock_recommendation(recommendations: str) -> str:
         
         # 发送推送
         result = notifier.send_message(
-            title="📈 CrewAI Stock 今日推荐",
+            title="📈 CrewAI A-Stock 今日推荐",
             content=html_content,
             template="html"
         )

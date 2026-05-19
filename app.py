@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-CrewAI Stock V2.0 - Web管理界面
+CrewAI A-Stock V2.0 - Web管理界面
 
 提供数据源、数据库、推送功能的Web管理界面
 

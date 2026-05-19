@@ -1,4 +1,4 @@
-﻿# CrewAI Stock
+﻿# CrewAI A-Stock
 
 > 基于 CrewAI 多智能体协作的 A 股智能分析与推荐系统（学习研究用）
 
@@ -72,8 +72,8 @@
 ### 2. 安装
 
 ```bash
-git clone https://github.com/<your-name>/crewai-stock.git
-cd crewai-stock
+git clone https://github.com/<your-name>/crewai-astock.git
+cd crewai-astock
 python -m venv venv
 # Windows
 venv\Scripts\activate
@@ -129,7 +129,7 @@ python app.py
 ## 项目结构
 
 ```
-crewai-stock/
+crewai-astock/
 ├── app.py                          # Flask 主入口
 ├── scheduler.py                    # 定时任务（持仓监控 / 新闻监控 / 绩效更新）
 ├── global_news_scheduler.py        # 全局新闻调度

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-交易日历工具模块 - CrewAI Stock V2.0
+交易日历工具模块 - CrewAI A-Stock V2.0
 
 提供交易日判断、交易日计算等功能
 

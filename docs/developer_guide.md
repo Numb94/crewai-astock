@@ -1,11 +1,11 @@
 # 开发者指南 (Developer Guide)
 
-本指南旨在帮助开发者理解 CrewAI Stock 的代码结构，并指导如何进行二次开发。
+本指南旨在帮助开发者理解 CrewAI A-Stock 的代码结构，并指导如何进行二次开发。
 
 ## 📂 项目目录结构
 
 ```text
-crewAi_stock/
+crewai-astock/
 ├── docs/                   # 文档
 ├── src/
 │   ├── agents/            # AI Agent 定义

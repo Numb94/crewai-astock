@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-CrewAI Stock - 股票评估Crew
+CrewAI A-Stock - 股票评估Crew
 
 专门用于评估指定股票，不推送通知
 4个Agent协作完成股票评估：

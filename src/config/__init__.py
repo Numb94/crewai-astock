@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-CrewAI Stock - 配置模块初始化
+CrewAI A-Stock - 配置模块初始化
 
 确保config目录可以被import
 """

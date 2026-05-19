@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-CrewAI Stock - Tavily多Key轮询管理器
+CrewAI A-Stock - Tavily多Key轮询管理器
 
 支持配置多个Tavily API Key，自动轮询使用，突破单Key 1000次/月限制
 

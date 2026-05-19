@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-CrewAI Stock - 智能推荐Crew
+CrewAI A-Stock - 智能推荐Crew
 
 6个Agent协作完成股票推荐：
 1. 复盘分析师 → 2. 市场情报官 → 3. 智能选股师 → 4. 多维分析师(并行) → 5. 风险管理官 → 6. 投资决策官

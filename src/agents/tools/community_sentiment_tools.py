@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-CrewAI Stock - 社区情绪分析工具
+CrewAI A-Stock - 社区情绪分析工具
 
 为CrewAI Agent提供社区评论获取和情绪分析能力
 支持雪球、东方财富股吧、淘股吧三大平台

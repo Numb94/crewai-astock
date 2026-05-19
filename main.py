@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-CrewAI Stock - 主程序入口
+CrewAI A-Stock - 主程序入口
 
 手动触发式智能股票推荐系统
 """
@@ -63,7 +63,7 @@ def print_banner():
     banner = """
 ╔═══════════════════════════════════════════════════════════════╗
 ║                                                               ║
-║       CrewAI Stock - 智能股票推荐系统 V2.0                     ║
+║       CrewAI A-Stock - 智能股票推荐系统 V2.0                     ║
 ║                                                               ║
 ║       基于CrewAI + DeepSeek的智能决策系统                      ║
 ║       手动触发 | 6个Agent | 6个Task | 并行优化                 ║
@@ -202,7 +202,7 @@ def push_to_wechat(recommendations: dict):
 def main():
     """主函数"""
     # 解析命令行参数
-    parser = argparse.ArgumentParser(description='CrewAI Stock - 智能股票推荐系统')
+    parser = argparse.ArgumentParser(description='CrewAI A-Stock - 智能股票推荐系统')
     parser.add_argument('--push', action='store_true', help='分析完成后推送到微信')
     parser.add_argument('--save', type=str, help='保存结果到文件')
     args = parser.parse_args()

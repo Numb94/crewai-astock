@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-K线数据API - CrewAI Stock V2.0
+K线数据API - CrewAI A-Stock V2.0
 
 提供K线图数据接口，支持推荐点标注、止盈止损线标注
 

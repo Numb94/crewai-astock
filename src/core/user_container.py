@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-CrewAI Stock - 用户容器
+CrewAI A-Stock - 用户容器
 
 实现多用户完全隔离：
 - 每个用户有独立的CrewAI实例

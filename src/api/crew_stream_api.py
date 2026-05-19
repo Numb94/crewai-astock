@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-CrewAI流式推送API - CrewAI Stock V2.0
+CrewAI流式推送API - CrewAI A-Stock V2.0
 
 描述: SSE（Server-Sent Events）流式推送CrewAI执行过程
 实时推送Agent输出到前端聊天窗

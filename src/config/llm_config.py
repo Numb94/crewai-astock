@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-CrewAI Stock - LLM配置模块
+CrewAI A-Stock - LLM配置模块
 
 作者: AI Architect
 日期: 2025-11-01

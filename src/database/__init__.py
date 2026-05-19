@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-CrewAI Stock V2.0 - Database Module
+CrewAI A-Stock V2.0 - Database Module
 
 Unified exports for database-related content
 """

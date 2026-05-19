@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-东方财富爬虫工具包 - CrewAI Stock V2.0
+东方财富爬虫工具包 - CrewAI A-Stock V2.0
 
 描述: 东方财富股票数据爬虫，集成巨量代理池机制
 作为三个数据源之一，主要提供实时行情和补充数据

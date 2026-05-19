@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-智兔API工具包 - CrewAI Stock V2.0
+智兔API工具包 - CrewAI A-Stock V2.0
 
 描述: 智兔API完整接口封装，包含股票数据获取、技术指标、财务数据等功能
 API文档更新时间: 2025-10-21 15:07:28

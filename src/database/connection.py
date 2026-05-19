@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-CrewAI Stock V2.0 - 数据库连接管理
+CrewAI A-Stock V2.0 - 数据库连接管理
 
 作者: AI Architect
 版本: v2.0.6

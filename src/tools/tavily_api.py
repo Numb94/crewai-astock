@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-CrewAI Stock V2.0 - Tavily 新闻 API 工具封装
+CrewAI A-Stock V2.0 - Tavily 新闻 API 工具封装
 
 提供新闻搜索、热点事件提取、情绪分析功能
 

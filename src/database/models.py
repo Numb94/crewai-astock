@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-CrewAI Stock V2.0 - 数据库 ORM 模型
+CrewAI A-Stock V2.0 - 数据库 ORM 模型
 
 作者: AI Architect
 版本: v2.0.5-db-complete

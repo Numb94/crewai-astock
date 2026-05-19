@@ -1,4 +1,4 @@
-﻿# CrewAI Stock — AI 协作指南
+﻿# CrewAI A-Stock — AI 协作指南
 
 > 这份文档面向在本仓库工作的 AI 助手（如 Claude Code），用于快速建立项目心智模型。
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-开盘前新闻摘要生成器 - CrewAI Stock V2.0
+开盘前新闻摘要生成器 - CrewAI A-Stock V2.0
 
 描述: 生成开盘前新闻摘要，汇总夜间重大新闻
 格式:

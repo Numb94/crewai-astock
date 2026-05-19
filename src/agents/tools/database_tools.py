@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-CrewAI Stock - 数据库查询工具
+CrewAI A-Stock - 数据库查询工具
 
 为CrewAI Agent提供数据库查询能力
 

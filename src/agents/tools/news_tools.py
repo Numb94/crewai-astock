@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-CrewAI Stock - 新闻分析工具
+CrewAI A-Stock - 新闻分析工具
 
 为CrewAI Agent提供Tavily新闻搜索和情绪分析能力
 """

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-CrewAI Stock - 智能Agent定义
+CrewAI A-Stock - 智能Agent定义
 
 6个核心Agent：复盘、情报、选股、分析、风险、决策
 针对DeepSeek优化

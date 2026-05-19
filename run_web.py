@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-CrewAI Stock Web管理界面启动脚本
+CrewAI A-Stock Web管理界面启动脚本
 
 简化启动命令，提供更好的开发体验
 
@@ -25,7 +25,7 @@ def create_env_file():
     if not env_file.exists():
         print("📝 创建.env配置文件...")
         with open(env_file, 'w', encoding='utf-8') as f:
-            f.write("""# CrewAI Stock 环境配置
+            f.write("""# CrewAI A-Stock 环境配置
 
 # 数据库配置
 DATABASE_PATH=data/stock_trading.db
@@ -133,7 +133,7 @@ def start_web_server(host='0.0.0.0', port=7000, debug=False):
     return True
 
 def main():
-    parser = argparse.ArgumentParser(description='CrewAI Stock Web管理界面')
+    parser = argparse.ArgumentParser(description='CrewAI A-Stock Web管理界面')
     parser.add_argument('--host', default='0.0.0.0', help='服务器地址 (默认: 0.0.0.0)')
     parser.add_argument('--port', type=int, default=7000, help='服务器���口 (默认: 7000)')
     parser.add_argument('--debug', action='store_true', help='启用调试模式')
@@ -142,7 +142,7 @@ def main():
     args = parser.parse_args()
 
     print("=" * 60)
-    print("🎯 CrewAI Stock Web管理界面")
+    print("🎯 CrewAI A-Stock Web管理界面")
     print("=" * 60)
 
     # 创建目录

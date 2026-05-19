@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-CrewAI Stock - Embeddings配置模块
+CrewAI A-Stock - Embeddings配置模块
 
 使用硅基流动(SiliconFlow)的Embeddings服务
 """

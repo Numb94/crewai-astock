@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-新闻数据源管理器 - CrewAI Stock
+新闻数据源管理器 - CrewAI A-Stock
 
 描述: 基于 Tavily API 的新闻获取与紧急程度判断
 

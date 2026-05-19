@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-CrewAI Stock V2.0 - 数据库初始化脚本
+CrewAI A-Stock V2.0 - 数据库初始化脚本
 
 用法:
     python -m src.database.init_db              # 创建所有表
@@ -223,7 +223,7 @@ def check_database():
 
 def main():
     """主函数"""
-    parser = argparse.ArgumentParser(description='CrewAI Stock V2.0 - 数据库初始化')
+    parser = argparse.ArgumentParser(description='CrewAI A-Stock V2.0 - 数据库初始化')
     parser.add_argument(
         '--drop',
         action='store_true',

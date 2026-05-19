@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-新闻监控调度器 - CrewAI Stock V2.0
+新闻监控调度器 - CrewAI A-Stock V2.0
 
 描述: 根据交易时间动态调整监控频率
 - 休盘期间：每1小时

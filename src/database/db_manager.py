@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-CrewAI Stock V2.0 - 数据库管理器 (CRUD 工具)
+CrewAI A-Stock V2.0 - 数据库管理器 (CRUD 工具)
 
 提供数据库操作的统一接口
 

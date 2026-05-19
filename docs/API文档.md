@@ -1,6 +1,6 @@
 # API接口文档
 
-> CrewAI Stock - 完整的REST API接口说明
+> CrewAI A-Stock - 完整的REST API接口说明
 
 **版本**: v2.0  
 **基础URL**: `http://localhost:7000`  

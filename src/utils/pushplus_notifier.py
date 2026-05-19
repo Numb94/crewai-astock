@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-CrewAI Stock V2.0 - PushPlus 推送通知器
+CrewAI A-Stock V2.0 - PushPlus 推送通知器
 
 提供微信推送功能,用于股票推荐、风险预警、会议纪要等
 

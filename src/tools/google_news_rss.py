@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Google News RSS工具 - CrewAI Stock V2.0
+Google News RSS工具 - CrewAI A-Stock V2.0
 
 描述: Google News RSS新闻获取工具，免费、实时性好
 作为三个数据源之一，主要提供实时新闻

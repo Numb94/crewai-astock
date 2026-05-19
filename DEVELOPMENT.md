@@ -15,8 +15,8 @@
 #### 1. 克隆仓库
 
 ```bash
-git clone https://github.com/yourusername/crewAi_stock.git
-cd crewAi_stock
+git clone https://github.com/yourusername/crewai-astock.git
+cd crewai-astock
 ```
 
 #### 2. 创建虚拟环境
@@ -98,7 +98,7 @@ python run_web.py
 ##  项目结构
 
 ```
-crewAi_stock/
+crewai-astock/
  app.py                      # Flask 应用主文件
  scheduler.py                # 主调度器
  main.py                     # CrewAI 入口（命令行模式）
@@ -470,8 +470,8 @@ CMD [\"gunicorn\", \"-w\", \"4\", \"-b\", \"0.0.0.0:5000\", \"app:app\"]
 构建并运行：
 
 ```bash
-docker build -t crewai-stock .
-docker run -p 5000:5000 --env-file .env crewai-stock
+docker build -t crewai-astock .
+docker run -p 5000:5000 --env-file .env crewai-astock
 ```
 
 #### 3. 使用 Nginx 反向代理

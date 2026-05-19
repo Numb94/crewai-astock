@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-CrewAI Stock - 市场数据工具
+CrewAI A-Stock - 市场数据工具
 
 为CrewAI Agent提供市场数据查询能力(基于智兔API)
 """

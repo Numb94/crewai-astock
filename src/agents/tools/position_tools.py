@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-CrewAI Stock - 持仓管理工具
+CrewAI A-Stock - 持仓管理工具
 
 为CrewAI Agent提供持仓查询、风险计算能力
 """

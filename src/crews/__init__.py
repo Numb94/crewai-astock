@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-CrewAI Stock - Crews模块
+CrewAI A-Stock - Crews模块
 
 包含所有Crew定义
 """

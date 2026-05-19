@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-CrewAI Stock - 持仓监控Crew
+CrewAI A-Stock - 持仓监控Crew
 
 实现持仓监控的完整流程：
 1. 查询所有持仓

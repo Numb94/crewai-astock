@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-新闻数据库管理器 - CrewAI Stock V2.0
+新闻数据库管理器 - CrewAI A-Stock V2.0
 
 描述: 管理市场新闻的数据库操作
 - 保存新闻到数据库
